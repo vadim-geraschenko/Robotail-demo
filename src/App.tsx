@@ -1,19 +1,17 @@
 import { useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
-  BadgePercent,
-  Calculator,
+  ArrowLeft,
+  ArrowRight,
   Check,
-  ChevronRight,
   CreditCard,
-  Gift,
-  LandPlot,
-  RadioTower,
-  ShipWheel,
-  Sparkles,
-  Swords,
-  Users,
-  Zap,
+  Minus,
+  Phone,
+  Plus,
+  ScanLine,
+  ShieldCheck,
+  ShoppingCart,
+  X,
 } from 'lucide-react';
 import heroImage from './assets/product/1_11zon.webp';
 import sideImage from './assets/product/2_11zon.webp';
@@ -31,49 +29,88 @@ import darkImage from './assets/product/бм_темнота.webp';
 
 const basePrice = 630000;
 
+const product = {
+  sku: 'rr_030',
+  title: 'Автомат морской бой «Бродяги морей»',
+  maker: 'Robotic Retailers',
+  country: 'Россия',
+  description:
+    'Двусторонний аркадный автомат с механикой двойной оплаты, призовым модулем и QR-бонусами для ТРЦ, игровых клубов и развлекательных центров.',
+};
+
 const options = [
-  { id: 'coin', label: 'Монетоприемник', price: 10000 },
-  { id: 'bill', label: 'Купюроприемник', price: 35000 },
-  { id: 'lite', label: 'Купюроприемник Lite без кешбокса', price: 14000 },
-  { id: 'terminal', label: 'Терминал безнал + учёт выручки + Wi-Fi + VIP SIM', price: 18000 },
+  { id: 'coin', label: 'Монетоприемник', price: 10000, note: 'Прием монет для классического сценария оплаты.' },
+  { id: 'bill', label: 'Купюроприемник', price: 35000, note: 'Полноценный прием наличных с кешбоксом.' },
+  { id: 'lite', label: 'Купюроприемник Lite без кешбокса', price: 14000, note: 'Упрощенная наличная комплектация.' },
+  {
+    id: 'terminal',
+    label: 'Безналичный терминал',
+    price: 18000,
+    note: 'Оплата картой, учет выручки, Wi-Fi и VIP SIM.',
+  },
 ];
 
 const gallery = [
-  { src: heroImage, label: 'Общий вид автомата' },
-  { src: darkImage, label: 'Подсветка в темном зале' },
-  { src: arenaImage, label: 'Игровая сцена' },
-  { src: detailImage, label: 'Игровой экран' },
-  { src: sideImage, label: 'Две стороны корпуса' },
-  { src: screenImage, label: 'Детали оформления' },
-  { src: controlsImage, label: 'Панель управления' },
-  { src: prizeImage, label: 'Призовая зона' },
-  { src: cabinetImage, label: 'Корпус автомата' },
-  { src: paymentImage, label: 'Платежный модуль' },
-  { src: lightImage, label: 'Подсветка корпуса' },
-  { src: twinImage, label: 'Двухсторонняя конфигурация' },
-  { src: backImage, label: 'Задняя часть корпуса' },
+  { src: heroImage, label: 'Общий вид автомата', caption: 'Корпус, две стороны и призовой модуль в одном кадре.', position: 'center' },
+  { src: twinImage, label: 'Две игровые стороны', caption: 'Два игровых места для парной игры или игры с ботом.', position: 'center' },
+  { src: arenaImage, label: 'Игровое поле', caption: 'Поле морского боя и механика снарядов.', position: 'center' },
+  { src: controlsImage, label: 'Панель управления', caption: 'Органы управления и зона игрока крупным планом.', position: 'center' },
+  { src: prizeImage, label: 'Призовая зона', caption: 'Витрина, хоппер и мотивация повторной игры.', position: 'center' },
+  { src: paymentImage, label: 'Платёжный модуль', caption: 'Зоны оплаты для коммерческой эксплуатации.', position: 'center' },
+  { src: darkImage, label: 'Подсветка корпуса', caption: 'Неон и пиратская тема как магнит в проходном трафике.', position: 'center' },
+  { src: cabinetImage, label: 'Корпус автомата', caption: 'Дерево, форма бочки и фронтальная витрина.', position: 'center' },
+  { src: detailImage, label: 'Детали экрана', caption: 'Экранная зона и оформление интерфейса.', position: 'center' },
+  { src: screenImage, label: 'Оформление игры', caption: 'Игровой процесс и уровни сложности бота.', position: 'center' },
+  { src: lightImage, label: 'Световой контур', caption: 'Акцентная подсветка без лишнего декора.', position: 'center' },
+  { src: sideImage, label: 'Боковая проекция', caption: 'Габарит и профиль корпуса для планирования установки.', position: 'center' },
+  { src: backImage, label: 'Задняя часть', caption: 'Технический вид задней части автомата.', position: 'center' },
 ];
 
-const reasons = [
+const revenueReasons = [
   {
-    title: 'Двойная оплата',
-    text: 'Когда играют двое, платят оба игрока.',
-    icon: Users,
+    eyebrow: '01 / платежи',
+    title: 'Две оплаты за один матч',
+    text: 'Оба игрока участвуют в оплате, поэтому парная игра повышает средний чек с одной сессии.',
+    image: paymentImage,
+    className: 'reason-card-large',
+    visual: '2 игрока = 2 оплаты',
+    position: 'center',
   },
   {
+    eyebrow: '02 / поток',
     title: 'Две стороны работают параллельно',
-    text: 'Один игрок может играть с ботом, а вторая сторона — принимать другого игрока.',
-    icon: Swords,
+    text: 'Одна сторона принимает игрока против бота, другая остается доступной для второго сценария.',
+    image: twinImage,
+    className: 'reason-card-split',
+    visual: 'левая сторона / правая сторона',
+    position: 'center',
   },
   {
+    eyebrow: '03 / повтор',
     title: 'Призовая механика',
-    text: 'Хоппер, витрина призов и QR-бонусы повышают мотивацию играть снова.',
-    icon: Gift,
+    text: 'Хоппер, витрина призов и QR-бонусы дают понятный повод сыграть снова.',
+    image: prizeImage,
+    className: 'reason-card-compact',
+    visual: 'хоппер + витрина + QR',
+    position: 'center',
   },
   {
+    eyebrow: '04 / внимание',
     title: 'Цепляет проходной трафик',
-    text: 'Яркий корпус, пиратская тема и подсветка работают как визуальный магнит в ТРЦ.',
-    icon: Sparkles,
+    text: 'Деревянный корпус, пиратская тема и подсветка считываются издалека в ТРЦ.',
+    image: darkImage,
+    className: 'reason-card-tall',
+    visual: 'акцент в зоне трафика',
+    position: 'center',
+  },
+  {
+    eyebrow: '05 / удержание',
+    title: '5 уровней сложности бота',
+    text: 'Новичкам проще начать, а постоянным игрокам есть куда повышать сложность.',
+    image: screenImage,
+    className: 'reason-card-wide',
+    visual: 'уровни 1-5',
+    position: 'center',
   },
 ];
 
@@ -98,7 +135,7 @@ function formatMoney(value: number) {
 
 function formatMonths(value: number) {
   if (!Number.isFinite(value)) return '—';
-  if (value < 1) return 'до 1 мес.';
+  if (value < 1) return 'менее 1 мес.';
   return `${value.toFixed(value < 10 ? 1 : 0).replace('.', ',')} мес.`;
 }
 
@@ -113,25 +150,26 @@ type SliderProps = {
 };
 
 function Slider({ label, value, min, max, step = 1, suffix = '', onChange }: SliderProps) {
+  const progress = ((value - min) / (max - min)) * 100;
+
   return (
-    <label className="block border-b border-white/10 py-4 last:border-b-0">
-      <span className="flex items-center justify-between gap-3 text-xs text-white/64 sm:text-sm">
+    <label className="roi-slider">
+      <span className="roi-slider-top">
         <span>{label}</span>
-        <strong className="text-sm font-black text-white sm:text-base">
-          {suffix === '₽' ? formatMoney(value) : `${value}${suffix}`}
-        </strong>
+        <strong>{suffix === '₽' ? formatMoney(value) : `${value}${suffix}`}</strong>
       </span>
       <input
-        className="roi-range mt-3 w-full"
+        className="roi-range"
         type="range"
         min={min}
         max={max}
         step={step}
         value={value}
+        style={{ '--range-progress': `${progress}%` } as React.CSSProperties}
         onInput={(event) => onChange(Number(event.currentTarget.value))}
         onChange={(event) => onChange(Number(event.currentTarget.value))}
       />
-      <span className="mt-1.5 flex justify-between text-[11px] text-white/36">
+      <span className="roi-slider-scale">
         <span>{suffix === '₽' ? formatMoney(min) : `${min}${suffix}`}</span>
         <span>{suffix === '₽' ? formatMoney(max) : `${max}${suffix}`}</span>
       </span>
@@ -142,15 +180,17 @@ function Slider({ label, value, min, max, step = 1, suffix = '', onChange }: Sli
 function App() {
   const [activeImage, setActiveImage] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<string[]>(['terminal']);
+  const [quantity, setQuantity] = useState(1);
   const [pricePerGame, setPricePerGame] = useState(200);
   const [paymentsPerDay, setPaymentsPerDay] = useState(80);
   const [daysPerMonth, setDaysPerMonth] = useState(30);
   const [rent, setRent] = useState(30000);
   const [serviceCost, setServiceCost] = useState(15000);
-  const calcRef = useRef<HTMLElement | null>(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const touchStartX = useRef<number | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
-  const totalPrice = useMemo(() => {
+  const unitPrice = useMemo(() => {
     return (
       basePrice +
       options
@@ -159,17 +199,20 @@ function App() {
     );
   }, [selectedOptions]);
 
+  const totalPrice = unitPrice * quantity;
+
   const roi = useMemo(() => {
     const monthlyRevenue = pricePerGame * paymentsPerDay * daysPerMonth;
-    const monthlyProfit = monthlyRevenue - rent - serviceCost;
-    const paybackMonths = monthlyProfit > 0 ? totalPrice / monthlyProfit : Infinity;
+    const monthlyExpenses = rent + serviceCost;
+    const monthlyProfit = monthlyRevenue - monthlyExpenses;
+    const paybackMonths = monthlyProfit > 0 ? unitPrice / monthlyProfit : Infinity;
     return {
       monthlyRevenue,
+      monthlyExpenses,
       monthlyProfit,
       paybackMonths,
-      annualRevenue: monthlyRevenue * 12,
     };
-  }, [daysPerMonth, paymentsPerDay, pricePerGame, rent, serviceCost, totalPrice]);
+  }, [daysPerMonth, paymentsPerDay, pricePerGame, rent, serviceCost, unitPrice]);
 
   const toggleOption = (id: string) => {
     setSelectedOptions((current) =>
@@ -177,283 +220,289 @@ function App() {
     );
   };
 
-  const scrollToCalc = () => calcRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const moveGallery = (direction: 1 | -1) => {
+    setActiveImage((current) => (current + direction + gallery.length) % gallery.length);
+  };
+
+  const handleTouchEnd = (x: number) => {
+    if (touchStartX.current === null) return;
+    const delta = touchStartX.current - x;
+    if (Math.abs(delta) > 42) moveGallery(delta > 0 ? 1 : -1);
+    touchStartX.current = null;
+  };
+
+  const activeGalleryItem = gallery[activeImage];
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#f3efe6] text-[#171018]">
-      <section className="hero-shell relative isolate min-h-screen px-4 pb-10 pt-4 text-white sm:px-6 lg:px-8">
-        <div className="sonar-bg" aria-hidden="true" />
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 text-xs text-white/62 sm:text-sm">
-          <div className="flex items-center gap-2 font-black tracking-[0.16em] text-white/78">
-            <RadioTower className="h-3.5 w-3.5 text-[#59d3d8]" />
-            ROBOTAIL DEMO
+    <main className="site-shell">
+      <header className="topbar">
+        <div className="topbar-inner">
+          <div className="brand-lockup">
+            <span className="brand-mark">
+              <ScanLine className="h-5 w-5" />
+            </span>
+            <span>
+              <strong>Robotail</strong>
+              <small>Аркадное оборудование</small>
+            </span>
           </div>
-          <div className="hidden items-center gap-2 sm:flex">
-            <span>Новинка</span>
-            <span className="h-1 w-1 rounded-full bg-[#f2b94b]" />
-            <span>Предзаказ</span>
-          </div>
+          <a className="manager-link" href="tel:+78000000000">
+            Связаться с менеджером
+          </a>
         </div>
+      </header>
 
-        <div className="relative mx-auto grid max-w-7xl gap-7 pt-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-end lg:pt-12">
-          <div className="relative z-30 lg:pb-14">
-            <div className="mb-4 flex flex-wrap gap-2">
-              {['Нет в наличии', 'Россия', 'Robotic Retailers'].map((item) => (
-                <span key={item} className="border border-white/16 bg-white/[0.08] px-3 py-1 text-xs font-bold text-white/72 backdrop-blur">
-                  {item}
-                </span>
+      <section className="hero-section">
+        <div className="hero-grid">
+          <section className="gallery-card" aria-label="Галерея товара">
+            <button
+              type="button"
+              className="gallery-main"
+              onClick={() => setLightboxOpen(true)}
+              onTouchStart={(event) => {
+                touchStartX.current = event.changedTouches[0].clientX;
+              }}
+              onTouchEnd={(event) => handleTouchEnd(event.changedTouches[0].clientX)}
+              aria-label="Открыть фото товара"
+            >
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeGalleryItem.src}
+                  src={activeGalleryItem.src}
+                  alt={activeGalleryItem.label}
+                  style={{ objectPosition: activeGalleryItem.position }}
+                  initial={prefersReducedMotion ? false : { opacity: 0 }}
+                  animate={prefersReducedMotion ? undefined : { opacity: 1 }}
+                  exit={prefersReducedMotion ? undefined : { opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                />
+              </AnimatePresence>
+              <span className="gallery-counter">
+                {activeImage + 1} / {gallery.length}
+              </span>
+            </button>
+            <div className="gallery-controls">
+              <button type="button" onClick={() => moveGallery(-1)} aria-label="Предыдущее фото">
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+              <div>
+                <strong>{activeGalleryItem.label}</strong>
+                <p>{activeGalleryItem.caption}</p>
+              </div>
+              <button type="button" onClick={() => moveGallery(1)} aria-label="Следующее фото">
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="gallery-dots" aria-label="Навигация по фото">
+              {gallery.map((image, index) => (
+                <button
+                  key={image.src}
+                  type="button"
+                  onClick={() => setActiveImage(index)}
+                  className={activeImage === index ? 'is-active' : ''}
+                  aria-label={`Показать фото: ${image.label}`}
+                />
               ))}
             </div>
-            <p className="mb-3 text-sm font-black uppercase tracking-[0.2em] text-[#f2b94b]">
-              Морской бой для коммерческих площадок
-            </p>
-            <h1 className="max-w-5xl font-display text-[44px] font-black leading-[0.88] tracking-normal sm:text-[78px] lg:max-w-[680px] lg:text-[82px] xl:text-[94px]">
-              Автомат морской бой «Бродяги морей»
-            </h1>
-            <p className="mt-5 max-w-xl text-base leading-7 text-white/72 lg:text-lg">
-              Двухсторонний аркадный автомат с механикой двойной оплаты, призовым модулем и
-              QR-бонусами. Для ТРЦ, игровых клубов и развлекательных центров, где важны трафик,
-              вовлечение и повторные игры.
-            </p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <button
-                type="button"
-                onClick={scrollToCalc}
-                className="group inline-flex items-center justify-center gap-2 bg-[#59d3d8] px-5 py-3 text-sm font-black text-[#071116] transition hover:bg-white"
-              >
-                <Calculator className="h-4 w-4" />
-                Рассчитать окупаемость
-                <ChevronRight className="h-4 w-4 transition group-hover:translate-x-1" />
-              </button>
-              <button
-                type="button"
-                className="inline-flex items-center justify-center gap-2 border border-white/16 bg-white/[0.09] px-5 py-3 text-sm font-black text-white backdrop-blur transition hover:bg-white/16"
-              >
-                <CreditCard className="h-4 w-4" />
-                Оформить предзаказ
-              </button>
-            </div>
-          </div>
+          </section>
 
-          <motion.div className="layered-product relative z-10 min-h-[430px] lg:min-h-[630px]" initial={false}>
-            <div className="absolute left-0 top-8 z-20 w-[44%] overflow-hidden border border-white/14 bg-black shadow-2xl shadow-black/50">
-              <img src={darkImage} alt="Автомат с подсветкой в темном зале" className="aspect-[4/5] h-full w-full object-cover opacity-90" />
-            </div>
-            <div className="absolute bottom-2 right-0 z-10 w-[86%] overflow-hidden border border-white/14 bg-black shadow-2xl shadow-black/50">
-              <img src={heroImage} alt="Автомат морской бой Бродяги морей" className="aspect-[4/5] h-full w-full object-cover" />
-            </div>
-            <div className="absolute right-4 top-0 z-30 w-[46%] border border-[#f2b94b]/40 bg-[#f2b94b] p-3 text-[#171018] shadow-xl">
-              <p className="text-xs font-black uppercase tracking-[0.16em] opacity-70">Цена от</p>
-              <p className="mt-1 text-3xl font-black">{formatMoney(basePrice)}</p>
-            </div>
-            <div className="absolute bottom-10 left-5 z-30 grid grid-cols-3 gap-2 bg-white/10 p-2 backdrop-blur">
-              {[controlsImage, prizeImage, sideImage].map((src) => (
-                <img key={src} src={src} alt="" className="h-20 w-20 object-cover" />
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      <section ref={calcRef} className="bg-[#171018] px-4 py-10 text-white sm:px-6 lg:px-8 lg:py-14">
-        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.7fr_1.3fr]">
-          <div>
-            <p className="mb-3 inline-flex items-center gap-2 bg-[#59d3d8]/15 px-3 py-1 text-xs font-black text-[#59d3d8]">
-              <BadgePercent className="h-3.5 w-3.5" />
-              ROI-калькулятор
-            </p>
-            <h2 className="font-display text-3xl font-black leading-[0.95] sm:text-5xl">
-              Посчитайте окупаемость под свою площадку
-            </h2>
-            <p className="mt-4 max-w-md text-sm leading-6 text-white/58 sm:text-base">
-              Цена автомата — это только вход. Важнее понять, сколько он может приносить при вашем трафике.
-            </p>
-          </div>
-
-          <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-            <div className="border border-white/10 bg-white/[0.04] px-4">
-              <Slider label="Цена игры" value={pricePerGame} min={50} max={500} step={10} suffix="₽" onChange={setPricePerGame} />
-              <Slider label="Оплат в день" value={paymentsPerDay} min={10} max={400} step={5} onChange={setPaymentsPerDay} />
-              <Slider label="Дней работы в месяц" value={daysPerMonth} min={15} max={31} onChange={setDaysPerMonth} />
-              <Slider label="Аренда места в месяц" value={rent} min={0} max={200000} step={5000} suffix="₽" onChange={setRent} />
-              <Slider label="Обслуживание и призовой фонд" value={serviceCost} min={0} max={150000} step={5000} suffix="₽" onChange={setServiceCost} />
-            </div>
-
-            <div className="grid content-between border border-[#f2b94b]/45 bg-[#f2b94b] p-4 text-[#171018]">
-              <div className="grid grid-cols-2 gap-px bg-[#171018]/20">
-                {[
-                  ['Выручка в месяц', formatMoney(roi.monthlyRevenue), Zap],
-                  ['Прибыль после расходов', roi.monthlyProfit > 0 ? formatMoney(roi.monthlyProfit) : 'ниже нуля', LandPlot],
-                  ['Окупаемость', roi.monthlyProfit > 0 ? formatMonths(roi.paybackMonths) : 'не окупается', Calculator],
-                  ['Выручка за год', formatMoney(roi.annualRevenue), RadioTower],
-                ].map(([label, value, Icon]) => (
-                  <div key={label as string} className="bg-[#f2b94b] p-3">
-                    <Icon className="mb-3 h-4 w-4 opacity-70" />
-                    <p className="text-[11px] font-black uppercase tracking-[0.1em] opacity-60">{label as string}</p>
-                    <p key={value as string} className="mt-1 text-2xl font-black leading-none">{value as string}</p>
-                  </div>
-                ))}
+          <div className="hero-side">
+            <div className="hero-copy">
+              <div className="tech-line">
+                <span>Артикул {product.sku}</span>
+                <span>{product.maker}</span>
+                <span>{product.country}</span>
               </div>
-              <div className="mt-5 border-l-4 border-[#171018] pl-3">
-                <p className="font-black">
-                  {roi.monthlyProfit <= 0
-                    ? 'При этих параметрах модель не окупается. Попробуйте увеличить трафик или цену игры.'
-                    : `При выбранных настройках покупка может окупиться примерно за ${formatMonths(roi.paybackMonths)}`}
-                </p>
-                <p className="mt-1 text-sm leading-6 opacity-70">
-                  Расчёт ориентировочный. Реальная окупаемость зависит от локации, трафика, цены игры и условий обслуживания.
-                </p>
-              </div>
+              <h1>{product.title}</h1>
             </div>
-          </div>
-        </div>
-      </section>
 
-      <section className="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-        <div className="mx-auto grid max-w-7xl gap-7 lg:grid-cols-[0.8fr_1.2fr]">
-          <div className="lg:sticky lg:top-8 lg:h-fit">
-            <h2 className="font-display text-3xl font-black leading-none sm:text-5xl">Почему автомат зарабатывает</h2>
-            <p className="mt-4 max-w-md text-sm leading-6 text-[#4c4248] sm:text-base">
-              Игрок видит аттракцион, площадка видит понятный сценарий монетизации проходного трафика.
-            </p>
-            <div className="mt-5 w-fit bg-[#171018] px-3 py-2 text-xs font-black text-white sm:text-sm">
-              5 уровней сложности бота
-            </div>
-          </div>
-
-          <div className="feature-rail">
-            {reasons.map(({ title, text, icon: Icon }, index) => (
-              <article key={title} className="feature-row">
-                <div className="feature-count">0{index + 1}</div>
-                <div className="grid h-12 w-12 place-items-center bg-[#171018] text-[#59d3d8]">
-                  <Icon className="h-5 w-5" />
-                </div>
+            <aside className="purchase-panel" aria-label="Покупка автомата">
+              <div className="price-head">
                 <div>
-                  <h3 className="text-xl font-black leading-tight">{title}</h3>
-                  <p className="mt-2 max-w-xl text-sm leading-6 text-[#5b5056]">{text}</p>
+                  <span className="price-label">Цена от</span>
+                  <strong>{formatMoney(basePrice)}</strong>
                 </div>
-              </article>
-            ))}
+                <div className="unit-price">
+                  <span>Итог за единицу</span>
+                  <b>{formatMoney(unitPrice)}</b>
+                </div>
+              </div>
+
+              <div className="configurator">
+                <div className="section-label">Комплектация</div>
+                <div className="option-list">
+                  {options.map((option) => (
+                    <label key={option.id} className="option-row">
+                      <input
+                        type="checkbox"
+                        checked={selectedOptions.includes(option.id)}
+                        onChange={() => toggleOption(option.id)}
+                        className="sr-only"
+                      />
+                      <span className="option-check">
+                        <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                      </span>
+                      <span className="option-body">
+                        <span className="option-name">{option.label}</span>
+                        <span className="option-note">{option.note}</span>
+                      </span>
+                      <strong>+{formatMoney(option.price)}</strong>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="purchase-bottom">
+                <div>
+                  <span className="section-label">Количество</span>
+                  <div className="quantity-control" aria-label="Количество">
+                    <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} aria-label="Уменьшить количество">
+                      <Minus className="h-4 w-4" />
+                    </button>
+                    <span>{quantity}</span>
+                    <button type="button" onClick={() => setQuantity((value) => Math.min(99, value + 1))} aria-label="Увеличить количество">
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="total-box">
+                  <span>Итого</span>
+                  <strong>{formatMoney(totalPrice)}</strong>
+                </div>
+              </div>
+
+              <div className="cta-stack">
+                <button type="button" className="primary-cta">
+                  <ShoppingCart className="h-5 w-5" />
+                  В корзину
+                </button>
+                <button type="button" className="secondary-cta">
+                  <CreditCard className="h-4 w-4" />
+                  Лизинг
+                </button>
+                <a className="tertiary-cta" href="tel:+78000000000">
+                  <Phone className="h-4 w-4" />
+                  Связаться с менеджером
+                </a>
+              </div>
+            </aside>
           </div>
         </div>
       </section>
 
-      <section className="bg-white px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-        <div className="mx-auto grid max-w-7xl gap-5 lg:grid-cols-[1.08fr_0.92fr]">
-          <div className="masonry-product">
-            {gallery.map((image, index) => (
-              <button
-                key={image.src}
-                type="button"
-                onClick={() => setActiveImage(index)}
-                className={`masonry-shot ${activeImage === index ? 'is-active' : ''}`}
-                aria-label={`Показать фото: ${image.label}`}
-              >
-                <img src={image.src} alt={image.label} />
-              </button>
-            ))}
+      <section className="revenue-section">
+        <div className="section-head">
+          <div>
+            <p>Экономика автомата</p>
+            <h2>Почему автомат зарабатывает</h2>
+          </div>
+          <span>
+            Конструкция, два игровых сценария, платежные опции и призовая мотивация работают вместе на повторные оплаты.
+          </span>
+        </div>
+
+        <div className="revenue-grid">
+          {revenueReasons.map((reason) => (
+            <article key={reason.title} className={`reason-card ${reason.className}`}>
+              <div className="reason-media">
+                <img src={reason.image} alt="" style={{ objectPosition: reason.position }} />
+              </div>
+              <div className="reason-content">
+                <span>{reason.eyebrow}</span>
+                <h3>{reason.title}</h3>
+                <p>{reason.text}</p>
+                <b>{reason.visual}</b>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="roi-section">
+        <div className="roi-intro">
+          <p className="pill-label">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            ROI-калькулятор
+          </p>
+          <h2>Ориентир по окупаемости</h2>
+          <p>
+            Расчёт показывает примерную экономику выбранной комплектации. Он помогает оценить порядок цифр до разговора с менеджером.
+          </p>
+          <ul>
+            <li>цена игры и поток оплат;</li>
+            <li>аренда, сервис и призовой фонд;</li>
+            <li>пересчет при смене комплектации.</li>
+          </ul>
+        </div>
+
+        <div className="roi-panel">
+          <div className="roi-inputs">
+            <Slider label="Цена игры" value={pricePerGame} min={50} max={500} step={10} suffix="₽" onChange={setPricePerGame} />
+            <Slider label="Оплат в день" value={paymentsPerDay} min={10} max={400} step={5} onChange={setPaymentsPerDay} />
+            <Slider label="Дней работы в месяц" value={daysPerMonth} min={15} max={31} onChange={setDaysPerMonth} />
+            <Slider label="Аренда места" value={rent} min={0} max={200000} step={5000} suffix="₽" onChange={setRent} />
+            <Slider label="Обслуживание и призовой фонд" value={serviceCost} min={0} max={150000} step={5000} suffix="₽" onChange={setServiceCost} />
           </div>
 
-          <div className="product-stage">
-            <AnimatePresence mode="wait">
-              <motion.img
-                key={gallery[activeImage].src}
-                src={gallery[activeImage].src}
-                alt={gallery[activeImage].label}
-                className="h-full w-full object-cover"
-                initial={prefersReducedMotion ? false : { opacity: 0, scale: 1.03 }}
-                animate={prefersReducedMotion ? undefined : { opacity: 1, scale: 1 }}
-                exit={prefersReducedMotion ? undefined : { opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.3 }}
-              />
-            </AnimatePresence>
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/78 to-transparent p-4 text-white">
-              <div className="inline-flex items-center gap-2 bg-white/12 px-3 py-1.5 text-xs font-bold backdrop-blur">
-                <ShipWheel className="h-3.5 w-3.5 text-[#f2b94b]" />
-                {gallery[activeImage].label}
+          <div className="roi-result">
+            <div className="roi-metric roi-metric-main">
+              <span>Примерная окупаемость</span>
+              <strong>{roi.monthlyProfit > 0 ? formatMonths(roi.paybackMonths) : 'не окупается'}</strong>
+            </div>
+            <div className="roi-metric-grid">
+              <div className="roi-metric">
+                <span>Выручка в месяц</span>
+                <strong>{formatMoney(roi.monthlyRevenue)}</strong>
+              </div>
+              <div className="roi-metric">
+                <span>Расходы</span>
+                <strong>{formatMoney(roi.monthlyExpenses)}</strong>
+              </div>
+              <div className="roi-metric">
+                <span>Прибыль</span>
+                <strong>{roi.monthlyProfit > 0 ? formatMoney(roi.monthlyProfit) : 'ниже нуля'}</strong>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-[#171018] px-4 py-12 text-white sm:px-6 lg:px-8 lg:py-16">
-        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="overflow-hidden">
-            <img src={twinImage} alt="Двухсторонний автомат" className="h-full min-h-[340px] w-full object-cover" />
-          </div>
-          <div className="tech-panel">
-            <div>
-              <h2 className="font-display text-3xl font-black leading-none sm:text-5xl">Характеристики без лишнего</h2>
-              <p className="mt-4 text-sm leading-6 text-white/58 sm:text-base">
-                Два соединенных корпуса, игра друг против друга или с ботом, хоппер для выдачи призов и возможность подключить витрину.
-              </p>
-            </div>
-            <dl className="mt-6 grid gap-px bg-white/12 sm:grid-cols-2">
-              {specs.map(([label, value]) => (
-                <div key={label} className="bg-[#171018] p-4">
-                  <dt className="text-xs font-black uppercase tracking-[0.12em] text-white/40">{label}</dt>
-                  <dd className="mt-2 text-xl font-black">{value}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-5 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
-            <h2 className="font-display text-3xl font-black leading-none sm:text-5xl">
-              Карточка должна не просто показывать товар — она должна помогать его купить.
-            </h2>
-            <p className="max-w-2xl text-base leading-7 text-[#5b5056]">
-              В этой версии клиент сразу видит сценарий использования, коммерческие преимущества и примерную экономику покупки.
+            <p className="roi-disclaimer">
+              Расчёт ориентировочный и зависит от локации, трафика, цены игры и условий обслуживания.
             </p>
           </div>
-
-          <div className="decision-interface mt-7">
-            <div className="bg-[#171018] p-5 text-white">
-              <p className="text-xs font-black uppercase tracking-[0.14em] text-white/45">Конфигурация</p>
-              <p className="mt-2 text-4xl font-black">{formatMoney(totalPrice)}</p>
-              <div className="mt-5 grid gap-2">
-                {options.map((option) => (
-                  <label key={option.id} className="flex cursor-pointer items-start gap-3 border border-white/10 p-3 transition hover:border-white/28">
-                    <input
-                      type="checkbox"
-                      checked={selectedOptions.includes(option.id)}
-                      onChange={() => toggleOption(option.id)}
-                      className="peer sr-only"
-                    />
-                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center border border-white/30 bg-white/10 text-transparent peer-checked:border-[#59d3d8] peer-checked:bg-[#59d3d8] peer-checked:text-[#071116]">
-                      <Check className="h-3.5 w-3.5" strokeWidth={3} />
-                    </span>
-                    <span className="flex min-w-0 flex-1 justify-between gap-3 text-sm">
-                      <span>{option.label}</span>
-                      <strong className="whitespace-nowrap text-white/82">+{formatMoney(option.price)}</strong>
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-            <div className="decision-image">
-              <img src={paymentImage} alt="Платежный модуль автомата" />
-            </div>
-            <div className="bg-[#f2b94b] p-5 text-[#171018]">
-              <p className="text-xs font-black uppercase tracking-[0.14em] opacity-60">Следующий шаг</p>
-              <p className="mt-2 text-2xl font-black leading-tight">Получить расчет под площадку</p>
-              <button
-                type="button"
-                onClick={scrollToCalc}
-                className="mt-5 inline-flex items-center justify-center gap-2 bg-[#171018] px-5 py-3 text-sm font-black text-white transition hover:bg-white hover:text-[#171018]"
-              >
-                Открыть калькулятор
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
         </div>
       </section>
+
+      <section className="spec-section">
+        <div className="spec-copy">
+          <p>Технические данные</p>
+          <h2>Характеристики для установки</h2>
+          <span>
+            Габариты, вес и питание важны для выбора места в ТРЦ, игровом клубе или развлекательном центре.
+          </span>
+        </div>
+        <dl className="spec-table">
+          {specs.map(([label, value]) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      {lightboxOpen && (
+        <div className="lightbox" role="dialog" aria-modal="true" aria-label="Просмотр фото">
+          <button type="button" className="lightbox-close" onClick={() => setLightboxOpen(false)} aria-label="Закрыть">
+            <X className="h-5 w-5" />
+          </button>
+          <button type="button" className="lightbox-nav lightbox-prev" onClick={() => moveGallery(-1)} aria-label="Предыдущее фото">
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <img src={activeGalleryItem.src} alt={activeGalleryItem.label} />
+          <button type="button" className="lightbox-nav lightbox-next" onClick={() => moveGallery(1)} aria-label="Следующее фото">
+            <ArrowRight className="h-5 w-5" />
+          </button>
+          <p>{activeGalleryItem.label}</p>
+        </div>
+      )}
     </main>
   );
 }
