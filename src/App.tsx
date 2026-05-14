@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ArrowLeft,
@@ -542,11 +542,11 @@ function App() {
     );
   };
 
-  const moveGallery = (direction: 1 | -1) => {
+  const moveGallery = useCallback((direction: 1 | -1) => {
     setActiveImage(
       (current) => (current + direction + gallery.length) % gallery.length,
     );
-  };
+  }, []);
 
   const handleTouchEnd = (x: number) => {
     if (touchStartX.current === null) return;
@@ -556,6 +556,19 @@ function App() {
   };
 
   const activeGalleryItem = gallery[activeImage];
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setLightboxOpen(false);
+      if (event.key === "ArrowLeft") moveGallery(-1);
+      if (event.key === "ArrowRight") moveGallery(1);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightboxOpen, moveGallery]);
 
   return (
     <main className="site-shell">
@@ -1019,6 +1032,7 @@ function App() {
           role="dialog"
           aria-modal="true"
           aria-label="Просмотр фото"
+          onClick={() => setLightboxOpen(false)}
         >
           <button
             type="button"
@@ -1031,21 +1045,65 @@ function App() {
           <button
             type="button"
             className="lightbox-nav lightbox-prev"
-            onClick={() => moveGallery(-1)}
+            onClick={(event) => {
+              event.stopPropagation();
+              moveGallery(-1);
+            }}
             aria-label="Предыдущее фото"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <img src={activeGalleryItem.src} alt={activeGalleryItem.label} />
+          <div
+            className="lightbox-panel"
+            onClick={(event) => event.stopPropagation()}
+            onTouchStart={(event) => {
+              touchStartX.current = event.changedTouches[0].clientX;
+            }}
+            onTouchEnd={(event) =>
+              handleTouchEnd(event.changedTouches[0].clientX)
+            }
+          >
+            <div className="lightbox-media">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeGalleryItem.src}
+                  src={activeGalleryItem.src}
+                  alt={activeGalleryItem.label}
+                  style={{ objectPosition: activeGalleryItem.position }}
+                  initial={prefersReducedMotion ? false : { opacity: 0 }}
+                  animate={prefersReducedMotion ? undefined : { opacity: 1 }}
+                  exit={prefersReducedMotion ? undefined : { opacity: 0 }}
+                  transition={{ duration: 0.18 }}
+                />
+              </AnimatePresence>
+            </div>
+            <div className="lightbox-caption">
+              <strong>{activeGalleryItem.label}</strong>
+              <p>{activeGalleryItem.caption}</p>
+            </div>
+            <div className="lightbox-dots" aria-label="Навигация по фото">
+              {gallery.map((image, index) => (
+                <button
+                  key={image.src}
+                  type="button"
+                  onClick={() => setActiveImage(index)}
+                  className={activeImage === index ? "is-active" : ""}
+                  aria-label={`Показать фото: ${image.label}`}
+                />
+              ))}
+            </div>
+          </div>
           <button
             type="button"
             className="lightbox-nav lightbox-next"
-            onClick={() => moveGallery(1)}
+            onClick={(event) => {
+              event.stopPropagation();
+              moveGallery(1);
+            }}
             aria-label="Следующее фото"
           >
             <ArrowRight className="h-5 w-5" />
           </button>
-          <p>{activeGalleryItem.label}</p>
         </div>
       )}
     </main>

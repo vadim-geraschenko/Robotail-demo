@@ -1379,20 +1379,77 @@ input:focus-visible {
   display: grid;
   place-items: center;
   background: rgba(3, 7, 18, 0.9);
-  padding: 4rem 1rem 3rem;
+  overflow: hidden;
+  padding: 4rem 1rem 1.5rem;
 }
 
-.lightbox img {
-  max-width: min(92vw, 72rem);
-  max-height: 76vh;
+.lightbox-panel {
+  display: grid;
+  width: min(100%, 82rem);
+  max-height: calc(100vh - 5.5rem);
+  min-width: 0;
+  gap: 0.75rem;
+}
+
+.lightbox-media {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  height: auto;
+  max-height: min(78vh, calc(100vh - 10.25rem));
+  min-height: 0;
+  overflow: hidden;
+}
+
+.lightbox-media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
   border-radius: 8px;
   object-fit: contain;
 }
 
-.lightbox p {
-  margin: 1rem 0 0;
+.lightbox-caption {
   color: #ffffff;
+  text-align: center;
+}
+
+.lightbox-caption strong {
+  display: block;
   font-weight: 900;
+}
+
+.lightbox-caption p {
+  max-width: 38rem;
+  margin: 0.22rem auto 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.lightbox-dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.34rem;
+}
+
+.lightbox-dots button {
+  width: 0.46rem;
+  height: 0.46rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.42);
+  cursor: pointer;
+  padding: 0;
+}
+
+.lightbox-dots button.is-active {
+  width: 1.4rem;
+  background: var(--cyan);
 }
 
 .lightbox-close {
@@ -1747,7 +1804,50 @@ input:focus-visible {
   }
 
   .lightbox-nav {
+    top: auto;
+    bottom: 1rem;
+    transform: none;
+  }
+
+  .lightbox {
+    padding: 3.75rem 0.5rem 4.25rem;
+  }
+
+  .lightbox-panel {
+    width: 100%;
+    max-height: calc(100vh - 8rem);
+    gap: 0.55rem;
+  }
+
+  .lightbox-media img {
+    max-width: calc(100vw - 1rem);
+  }
+
+  .lightbox-media {
+    aspect-ratio: 1 / 1;
+    height: auto;
+    max-height: calc(100vh - 12rem);
+  }
+
+  .lightbox-caption strong {
+    font-size: 0.95rem;
+    line-height: 1.15;
+  }
+
+  .lightbox-caption p {
     display: none;
+  }
+
+  .lightbox-dots {
+    gap: 0.28rem;
+  }
+
+  .lightbox-prev {
+    left: 1rem;
+  }
+
+  .lightbox-next {
+    right: 1rem;
   }
 }
 
