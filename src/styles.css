@@ -2441,7 +2441,7 @@ input:focus-visible {
 
   .reason-card {
     width: 100%;
-    max-width: 17.5rem; /* 280px */
+    max-width: 21rem;
     min-width: 0;
     justify-self: center;
     scroll-snap-align: none;
