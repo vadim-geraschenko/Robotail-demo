@@ -1725,6 +1725,12 @@ input:focus-visible {
     display: none;
   }
 
+  @media (min-width: 348px) {
+    .roi-profit-equation span:last-child {
+      grid-column: span 2;
+    }
+  }
+
   .roi-impact-row {
     grid-template-columns: 6.6rem minmax(0, 1fr) 2.25rem;
   }
@@ -2394,22 +2400,28 @@ input:focus-visible {
   }
 
   .reason-card {
-    grid-template-rows: 7.2rem 1fr;
+    grid-template-rows: 8.6rem 1fr;
   }
 
   .reason-content {
-    padding: 0.58rem;
+    grid-template-rows: auto minmax(1.85rem, auto) minmax(2.2rem, 1fr) auto;
+    padding: 0.46rem 0.54rem 0.52rem;
   }
 
   .reason-content h3 {
+    margin-top: 0.22rem;
     font-size: 0.86rem;
   }
 
   .reason-content p {
+    margin-top: 0.24rem;
     font-size: 0.64rem;
+    line-height: 1.28;
   }
 
   .reason-content b {
+    margin-top: 0.3rem;
+    padding: 0.26rem 0.38rem;
     font-size: 0.56rem;
   }
 }
